@@ -16,7 +16,7 @@ function Login(props) {
           <Logo src="/images/logo.png" alt="" />
         </a>
         <div>
-          <Join>Join now</Join>
+        
           <Signin>Sign in</Signin>
         </div>
       </Nav>
