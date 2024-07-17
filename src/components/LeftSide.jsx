@@ -5,8 +5,7 @@ import { Link } from 'react-router-dom';
 
 function LeftSide(props) {
   const { user } = useSelector((state) => state.user);
-  const profilePicture = useSelector((state) => state.profile.profilePicture);
-  const coverPicture = useSelector((state) => state.profile.coverPicture);
+  const { profilePicture, coverPicture, userProfile } = useSelector((state) => state.profile);
   console.log(user, "left user");
 
   return (
