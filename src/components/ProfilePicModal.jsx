@@ -23,8 +23,12 @@ const style = {
   boxShadow: 24,
   borderRadius: 3,
   overflow: "auto",
+  pt: 2,
+  // px: 4,
+  pb: 3,
   "@media (max-width: 768px)": {
     width: "100%",
+    height: "100%",
     borderRadius: 0,
   },
 };

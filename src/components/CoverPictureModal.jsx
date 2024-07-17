@@ -23,8 +23,12 @@ const style = {
   boxShadow: 24,
   borderRadius: 3,
   overflow: "auto",
+  pt: 2,
+  // px: 4,
+  pb: 3,
   "@media (max-width: 768px)": {
     width: "100%",
+    height: "100%",
     borderRadius: 0,
   },
 };
@@ -88,7 +92,7 @@ const CoverPictureModal = ({ open, handleClose }) => {
       <Fade in={open}>
         <Box sx={style}>
           <Header>
-            <h2>Update Cover Picture</h2>
+            <h2>UPDATED COCER PICTURE</h2>
             <button onClick={() => handleClose(false)}>
               <CloseIcon />
             </button>
