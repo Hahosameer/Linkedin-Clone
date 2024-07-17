@@ -103,7 +103,9 @@ function Header(props) {
                   <Link to="/profile">
                     <button>View Profile</button>
                   </Link>
+                  <Link to="/login">
                   <a onClick={handleSignOut}>Sign Out</a>
+                  </Link>
                 </SignOut>
               )}
                   </a>

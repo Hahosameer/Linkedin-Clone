@@ -60,7 +60,7 @@ const Container = styled.div`
 const Nav = styled.nav`
   max-width: 1128px;
   margin: auto;
-  padding: 12px 0px 16px;
+  padding:  10px 12px;
   display: flex;
   align-items: center;
   position: relative;
@@ -78,6 +78,10 @@ const Nav = styled.nav`
 const Logo = styled.img`
   width: 135px;
   height: 34px;
+  @media (max-width: 768px) {
+    width: 115px;
+    height: 34px;
+    }
 `;
 
 const Join = styled.a`
@@ -93,6 +97,9 @@ const Join = styled.a`
     color: rgba(0, 0, 0, 0.9);
     text-decoration: none;
   }
+  @media (max-width: 768px) {
+    padding: 5px 8px;
+    }
 `;
 const Signin = styled.a`
   box-shadow: inset 0 0 0 1px #0a66c2;
