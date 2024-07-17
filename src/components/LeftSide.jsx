@@ -7,7 +7,7 @@ function LeftSide(props) {
   const { user } = useSelector((state) => state.user);
   const { profilePicture, coverPicture, userProfile } = useSelector((state) => state.profile);
   console.log(user, "left user");
-
+console.log(coverPicture , "coverPicture");
   return (
     <Container>
       <ArtCard>
@@ -17,17 +17,17 @@ function LeftSide(props) {
           </CardBackground>
           <Link to="/profile">
             <Photo>
-            <img src={profilePicture || user?.photoURL || "/images/photo.svg"} alt="Profile" />
+            <img src={profilePicture}/>
             </Photo>
           </Link>
           <Links>
-            {user?.displayName ? user?.displayName : "Welcome, there"}
+            { userProfile?.firstname ||  user?.displayName || "Sameer Khan"} {userProfile?.lastname}
           </Links>
           <a>
             <AddPhotoText>
               <ul>
                 <li>
-                  Mern Stack Developer || JavaScript || React Js || Node Js || Express Js || Mongo db || Firebase || Bootstrap || Styled.components
+                {userProfile.headline}
                 </li>
               </ul>
             </AddPhotoText>
