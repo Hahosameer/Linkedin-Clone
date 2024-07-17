@@ -98,7 +98,7 @@ const Join = styled.a`
     text-decoration: none;
   }
   @media (max-width: 768px) {
-    padding: 5px 8px;
+    padding: 5px 9px;
     }
 `;
 const Signin = styled.a`
