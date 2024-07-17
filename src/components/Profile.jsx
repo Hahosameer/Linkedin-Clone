@@ -4,9 +4,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useDispatch, useSelector } from "react-redux";
 import ProfilePicModal from "./ProfilePicModal";
 import CoverPictureModal from "./CoverPictureModal";
-import EditProfileModal from "../components/EditProfileModal"; // Import EditProfileModal
+import EditProfileModal from "../components/EditProfileModal";
 import { setProfilePicture, setCoverPicture, setUserProfile } from "../Redux/Slices/profileSlice";
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -21,18 +21,20 @@ function Profile() {
     const fetchProfileData = async () => {
       try {
         const db = getFirestore();
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           dispatch(setProfilePicture(userData.photoURL));
           dispatch(setCoverPicture(userData.coverPhotoURL));
-          dispatch(setUserProfile({
-            firstname: userData.firstname,
-            lastname: userData.lastname,
-            city: userData.city,
-            country: userData.country,
-            headline: userData.headline,
-          }));
+          dispatch(
+            setUserProfile({
+              firstname: userData.firstname,
+              lastname: userData.lastname,
+              city: userData.city,
+              country: userData.country,
+              headline: userData.headline,
+            })
+          );
         }
       } catch (error) {
         console.error("Error fetching profile data: ", error);
@@ -77,10 +79,16 @@ function Profile() {
               <EditIcon />
             </Edit>
             <CoverPic>
-              <img src={coverPicture || "/images/card-bg.svg"} alt="Cover Background" />
+              <img
+                src={coverPicture || "/images/card-bg.svg"}
+                alt="Cover Background"
+              />
             </CoverPic>
             <ProfilePic onClick={handleOpenProfileModal}>
-              <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
+              <img
+                src={profilePicture || user?.photoURL || "/images/user.webp"}
+                alt="Profile"
+              />
             </ProfilePic>
           </CoverPhoto>
 
@@ -89,25 +97,28 @@ function Profile() {
               <EditIcon />
             </EiditData>
             <Data>
-              <h1>{ userProfile?.firstname ||  user?.displayName || "Sameer Khan"} {userProfile?.lastname}</h1>
+              <h1>
+                {userProfile?.firstname || user?.displayName || "Sameer Khan"}{" "}
+                {userProfile?.lastname}
+              </h1>
               <ul>
                 <li>{userProfile.headline}</li>
               </ul>
 
               <p>
-                {userProfile.city}, {userProfile.country}: <span>Contact info</span>
+                {userProfile.city}, {userProfile.country}:{" "}
+                <span>Contact info</span>
                 <h3>91 connections</h3>
               </p>
 
-         <ShowDetail>
-          <EditIconDetail>
-
-         <EditIcon />
-          </EditIconDetail>
-<h6>Open to work</h6>
-<h6>Back End Developer roles</h6>
-<a href="">Show Detail</a>
-         </ShowDetail>
+              <ShowDetail>
+                <EditIconDetail>
+                  <EditIcon />
+                </EditIconDetail>
+                <h6>Open to work</h6>
+                <h6>Back End Developer roles</h6>
+                <a href="">Show Detail</a>
+              </ShowDetail>
             </Data>
           </UserData>
         </LeftSide>
@@ -131,7 +142,11 @@ function Profile() {
           <RightBottom>
             <p>Sameer unlock your full potential with LinkedIn premium</p>
             <div>
-              <img style={{borderRadius: "50%", objectFit: "cover"}} src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
+              <img
+                style={{ borderRadius: "50%", objectFit: "cover" }}
+                src={profilePicture || user?.photoURL || "/images/user.webp"}
+                alt="Profile"
+              />
               <img src="/images/key.jpg" alt="Key" />
             </div>
             <h5>See who's viewed your profile in the last 90 days</h5>
@@ -139,12 +154,22 @@ function Profile() {
           </RightBottom>
         </RightSide>
       </ProfileWrapper>
-      <ProfilePicModal open={profileModalOpen} handleClose={handleCloseProfileModal} />
-      <CoverPictureModal open={coverModalOpen} handleClose={handleCloseCoverModal} />
-      <EditProfileModal open={editProfileModalOpen} handleClose={handleCloseEditProfileModal} />
+      <ProfilePicModal
+        open={profileModalOpen}
+        handleClose={handleCloseProfileModal}
+      />
+      <CoverPictureModal
+        open={coverModalOpen}
+        handleClose={handleCloseCoverModal}
+      />
+      <EditProfileModal
+        open={editProfileModalOpen}
+        handleClose={handleCloseEditProfileModal}
+      />
     </Container>
   );
 }
+
 
 const Container = styled.div`
   padding-top: 75px;
@@ -417,35 +442,32 @@ const RightBottom = styled.div`
 `;
 
 const ShowDetail = styled.div`
-position: relative;
-width: 350px;
-background-color: #DDE7F1;
-padding: 10px;
-border-radius: 10px;
-/* margin-top: 20px; */
-h6{
-  color: black;
-  font-weight: 200;
-}
-a{
-  color: #006aff;
-  font-weight: 500;
-}
-@media (max-width: 706px) {
-  width: 250px;
+  position: relative;
+  width: 350px;
+  background-color: #dde7f1;
+  padding: 10px;
+  border-radius: 10px;
+  /* margin-top: 20px; */
+  h6 {
+    color: black;
+    font-weight: 200;
   }
-`
+  a {
+    color: #006aff;
+    font-weight: 500;
+  }
+  @media (max-width: 706px) {
+    width: 250px;
+  }
+`;
 const EditIconDetail = styled.div`
-position: absolute;
-right: 10px;
-cursor: pointer;
-border-radius: 50%;
-padding: 7px;
-&:hover{
-background-color: #D4DDE6;
-
-}
-
-
-`
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 7px;
+  &:hover {
+    background-color: #d4dde6;
+  }
+`;
 export default Profile;

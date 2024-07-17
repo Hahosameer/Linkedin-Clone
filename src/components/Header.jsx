@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/Slices/userSlice";
@@ -8,11 +8,25 @@ import { Link } from "react-router-dom";
 function Header(props) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
+  const { profilePicture, userProfile } = useSelector((state) => state.profile);
   const [showSignOut, setShowSignOut] = useState(false);
-  const profilePicture = useSelector((state) => state.profile.profilePicture);
 
   const handleSignOutClick = () => {
     setShowSignOut(!showSignOut);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const signOut = await signOutAPI();
+      if (signOut instanceof Error) {
+        console.log(signOut.message);
+      } else {
+        dispatch(logout());
+        console.log("Sign-out successful.");
+      }
+    } catch (error) {
+      console.error("Error during sign-out:", error);
+    }
   };
 
   return (
@@ -33,14 +47,14 @@ function Header(props) {
         </Search>
         <Nav>
           <NavListWrap>
-          <Link to="/">
-            <NavList className="active">
-              <a title="Home">
-                <img src="/images/nav-home.svg" alt="Home Icon" />
-                <span>Home</span>
-              </a>
-            </NavList>
-          </Link>
+            <Link to="/">
+              <NavList className="active">
+                <a title="Home">
+                  <img src="/images/nav-home.svg" alt="Home Icon" />
+                  <span>Home</span>
+                </a>
+              </NavList>
+            </Link>
             <NavList>
               <a title="My Network">
                 <img src="/images/nav-network.svg" alt="Network Icon" />
@@ -66,50 +80,33 @@ function Header(props) {
               </a>
             </NavList>
             <User>
-              <a>
-                <img  onClick={handleSignOutClick} src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
-                <span onClick={handleSignOutClick}>
+              <a onClick={handleSignOutClick}>
+                <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
+                <span>
                   Me
                   <img src="/images/down-icon.svg" alt="Down Arrow" />
                 </span>
-             
+          
               {showSignOut && (
                 <SignOut>
                   <SignOutTop>
                     <div>
-                    <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
-
+                      <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
                     </div>
                     <div>
-                      <h1>Sameer Khan</h1>
+                      <h1>{userProfile?.firstname || user?.displayName || "Sameer Khan"} {userProfile?.lastname}</h1>
                       <ul>
-                        <li>Mern Stack Developer || JavaScript || React Js || Node Js || Express Js || Mongo db || Firebase || Bootstrap || Styled.components</li>
+                        <li>{userProfile?.headline}</li>
                       </ul>
                     </div>
                   </SignOutTop>
                   <Link to="/profile">
-                  <button>View Profile</button>
+                    <button>View Profile</button>
                   </Link>
-                  <a
-                    onClick={async () => {
-                      try {
-                        const signOut = await signOutAPI();
-                        if (signOut instanceof Error) {
-                          console.log(signOut.message);
-                        } else {
-                          dispatch(logout());
-                          console.log("Sign-out successful.");
-                        }
-                      } catch (error) {
-                        console.error("Error during sign-in:", error);
-                      }
-                    }}
-                  >
-                    Sign Out
-                  </a>
+                  <a onClick={handleSignOut}>Sign Out</a>
                 </SignOut>
               )}
-               </a>
+                  </a>
             </User>
             <Work>
               <a>

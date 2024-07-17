@@ -169,14 +169,7 @@ function MainSide() {
     }
   };
 
-  // const handleImageChange = (e) => {
-  //   const image = e.target.files[0];
-  //   if (!image || !image.type.startsWith("image")) {
-  //     alert("Please select a valid image file.");
-  //     return;
-  //   }
-  //   setSharedImage(image);
-  // };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowShareBoxTop(false);
@@ -190,11 +183,7 @@ function MainSide() {
       {showShareBoxTop && (
         <ShareBoxTop>
           <div>
-            {user?.photoURL ? (
-              <img src={user?.photoURL} alt="" />
-            ) : (
-              <img src="/images/user.webp" alt="" />
-            )}
+          <img src={profilePicture ||  "/images/user.webp"} alt="" />
             <h3>Hi {getGivenName(user?.displayName)}, are you hiring?</h3>
             <p>Discover free and easy ways to find a great hire, fast.</p>
             <HiringBtn>

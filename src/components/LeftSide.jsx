@@ -8,6 +8,7 @@ function LeftSide(props) {
   const { profilePicture, coverPicture, userProfile } = useSelector((state) => state.profile);
   console.log(user, "left user");
 console.log(coverPicture , "coverPicture");
+console.log(userProfile , "userProfile llllllllllllll");
   return (
     <Container>
       <ArtCard>
@@ -17,7 +18,10 @@ console.log(coverPicture , "coverPicture");
           </CardBackground>
           <Link to="/profile">
             <Photo>
-            <img src={profilePicture}/>
+            <img
+                src={profilePicture || user?.photoURL || "/images/user.webp"}
+                alt="Profile"
+              />
             </Photo>
           </Link>
           <Links>
@@ -93,6 +97,7 @@ const UserInfo = styled.div`
   padding: 12px 12px 16px;
   word-wrap: break-word;
   word-break: break-word;
+
 `;
 const CardBackground = styled.div`
   img{
@@ -136,6 +141,7 @@ const Links = styled.div`
   color: rgba(0, 0, 0, 0.9);
   font-weight: 600;
   text-decoration: none;
+  text-transform: capitalize;
   /* margin-top: 50px; */
 `;
 const AddPhotoText = styled.div`
