@@ -5,46 +5,58 @@ import { useDispatch, useSelector } from "react-redux";
 import ProfilePicModal from "./ProfilePicModal";
 import CoverPictureModal from "./CoverPictureModal";
 import EditProfileModal from "../components/EditProfileModal";
-import { setProfilePicture, setCoverPicture, setUserProfile } from "../Redux/Slices/profileSlice";
+import {
+  setProfilePicture,
+  setCoverPicture,
+  setUserProfile,
+} from "../Redux/Slices/profileSlice";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { useLocation, useParams } from "react-router-dom";
 
 function Profile() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
-  const { profilePicture, coverPicture, userProfile } = useSelector((state) => state.profile);
-
+  const { profilePicture, coverPicture, userProfile } = useSelector(
+    (state) => state.profile
+  );
+  const { article, loading: articleLoading } = useSelector(
+    (state) => state.article
+  );
+  console.log(article, "article");
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [coverModalOpen, setCoverModalOpen] = useState(false);
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
+  const location = useLocation();
+  const { id } = useParams(); // Ensure to get the ID from params
 
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const db = getFirestore();
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          dispatch(setProfilePicture(userData.photoURL));
-          dispatch(setCoverPicture(userData.coverPhotoURL));
-          dispatch(
-            setUserProfile({
-              firstname: userData.firstname,
-              lastname: userData.lastname,
-              city: userData.city,
-              country: userData.country,
-              headline: userData.headline,
-            })
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching profile data: ", error);
-      }
-    };
+    fetchProfileData();
+  }, [id]); // Add id to the dependency array to re-fetch when it changes
 
-    if (user) {
-      fetchProfileData();
+  const fetchProfileData = async () => {
+    try {
+      const db = getFirestore();
+      const userId = id || user.uid; // Fallback to logged-in user's UID if ID is not provided
+      const userDoc = await getDoc(doc(db, "users", userId));
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        dispatch(setProfilePicture(userData.photoURL));
+        dispatch(setCoverPicture(userData.coverPhotoURL));
+        dispatch(
+          setUserProfile({
+            firstname: userData.firstname,
+            lastname: userData.lastname,
+            city: userData.city,
+            country: userData.country,
+            headline: userData.headline,
+          })
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching profile data: ", error);
     }
-  }, [user, dispatch]);
+  };
 
   const handleOpenProfileModal = () => {
     setProfileModalOpen(true);
@@ -98,8 +110,9 @@ function Profile() {
             </EiditData>
             <Data>
               <h1>
-                {userProfile?.firstname || user?.displayName || "Sameer Khan"}{" "}
-                {userProfile?.lastname}
+                {`${userProfile?.firstname || ""} ${
+                  userProfile?.lastname || ""
+                } ${article?.user?.displayName || ""}`}
               </h1>
               <ul>
                 <li>{userProfile.headline}</li>
@@ -170,7 +183,6 @@ function Profile() {
   );
 }
 
-
 const Container = styled.div`
   padding-top: 75px;
   padding-left: 65px;
@@ -238,7 +250,7 @@ const CoverPic = styled.div`
   width: 100%;
   img {
     width: 100%;
-    height: 180px;
+    height: 190px;
     object-fit: cover;
     border-radius: 10px 10px 0px 0px;
     @media (max-width: 1100px) {
@@ -265,9 +277,9 @@ const ProfilePic = styled.div`
   img {
     position: absolute;
     top: 90px;
-    left: 20px;
-    width: 135px;
-    height: 135px;
+    left: 23px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     border: 2px solid white;
     object-fit: cover;

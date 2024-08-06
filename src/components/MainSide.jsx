@@ -195,7 +195,7 @@ function MainSide() {
       )}
       <ShareBox>
         <div >
-      <Link to="/profile">
+        <Link to={`/profile/${article?.user?.uid}`}>
       <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="" />
           </Link>
           <button onClick={handleOpenModal}>Start a Post</button>
@@ -226,15 +226,20 @@ function MainSide() {
                 <Article key={index}>
                   <SharedActor>
                     <a>
-                    <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="" />
-                      <div>
+                
+                      <Link to={`/profile/${article?.user?.uid}`}>
+                    <img src={article?.user?.photoURL || profilePicture  || "/images/user.webp"} alt="" />
+                      </Link>
+                   <div>
+
                         <span>{article.user.name}</span>
                         <span>
                           {new Date(parseInt(article.timestamp))
                             .toLocaleString()
                             .slice(0, 10)}
                         </span>
-                      </div>
+                            </div>
+                     
                     </a>
                     <button>
                       <img src="/images/ellipsis.png" width="25" alt="" />
@@ -451,7 +456,7 @@ const SharedActor = styled.div`
   a {
     margin-right: 12px;
     flex-grow: 1;
-    display: flex;
+    display: contents;
     text-decoration: none;
     img {
       width: 48px;
@@ -566,5 +571,8 @@ const Content = styled.div`
     margin-top: 0px;
   }
 `;
+
+
+
 
 export default MainSide;

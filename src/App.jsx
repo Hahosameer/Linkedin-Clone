@@ -65,7 +65,8 @@ function App() {
             )
           }
         />
-        <Route path="/profile" element={<><Profile />    <Header /></>} />
+        {/* <Route path="/profile" element={<><Profile />    <Header /></>} /> */}
+        <Route path="/profile/:id" element={<><Profile />    <Header /></>} />
       </Routes>
     </BrowserRouter>
   );

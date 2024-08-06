@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Redux/Slices/userSlice";
@@ -10,6 +10,8 @@ function Header(props) {
   const { user } = useSelector((state) => state.user);
   const { profilePicture, userProfile } = useSelector((state) => state.profile);
   const [showSignOut, setShowSignOut] = useState(false);
+  const { article, loading: articleLoading } = useSelector((state) => state.article);
+  const signOutRef = useRef(null);
 
   const handleSignOutClick = () => {
     setShowSignOut(!showSignOut);
@@ -28,6 +30,19 @@ function Header(props) {
       console.error("Error during sign-out:", error);
     }
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (signOutRef.current && !signOutRef.current.contains(event.target)) {
+        setShowSignOut(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [signOutRef]);
 
   return (
     <Container>
@@ -79,36 +94,38 @@ function Header(props) {
                 <span>Notifications</span>
               </a>
             </NavList>
-            <User>
+            <User ref={signOutRef}>
               <a onClick={handleSignOutClick}>
-                <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
+                <img src={ user?.photoURL || profilePicture || "/images/user.webp"} alt="Profile" />
                 <span>
                   Me
                   <img src="/images/down-icon.svg" alt="Down Arrow" />
                 </span>
-          
+            
               {showSignOut && (
                 <SignOut>
                   <SignOutTop>
                     <div>
-                      <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="Profile" />
+                      <img src={ user?.photoURL ||profilePicture || "/images/user.webp"} alt="Profile" />
                     </div>
                     <div>
-                      <h1>{userProfile?.firstname || user?.displayName || "Sameer Khan"} {userProfile?.lastname}</h1>
+                      <h1>  {`${userProfile?.firstname || ""} ${
+                  userProfile?.lastname || ""
+                } ${article?.user?.displayName || ""}`}</h1>
                       <ul>
                         <li>{userProfile?.headline}</li>
                       </ul>
                     </div>
                   </SignOutTop>
-                  <Link to="/profile">
+                  <Link to={`/profile/${article?.user?.uid}`}>
                     <button>View Profile</button>
                   </Link>
                   <Link to="/login">
-                  <a onClick={handleSignOut}>Sign Out</a>
+                    <a onClick={handleSignOut}>Sign Out</a>
                   </Link>
                 </SignOut>
               )}
-                  </a>
+                </a>
             </User>
             <Work>
               <a>
@@ -124,6 +141,7 @@ function Header(props) {
     </Container>
   );
 }
+
 
 const Container = styled.div`
   background-color: white;
@@ -305,7 +323,7 @@ margin:5px ;
 padding: 4px;
 color: #38acff;
 cursor: pointer !important;
-;
+
 
 }
   a {
@@ -314,6 +332,12 @@ cursor: pointer !important;
     display: flex;
     align-items: flex-start;
     padding-left: 10px;
+    text-decoration: none;
+    color: black;
+   
+    &:hover{
+      background-color:#EBEBEB
+    }
   }
 `;
 const SignOutTop = styled.div`
@@ -332,6 +356,7 @@ h1{
   margin-top: 10px;
   margin-left: 15px;
   font-size: 18px;
+  text-transform: capitalize;
 }
 ul{
   margin-left: 15px;

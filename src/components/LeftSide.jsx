@@ -3,9 +3,11 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 
+
 function LeftSide(props) {
   const { user } = useSelector((state) => state.user);
   const { profilePicture, coverPicture, userProfile } = useSelector((state) => state.profile);
+  const { article, loading: articleLoading } = useSelector((state) => state.article);
   console.log(user, "left user");
 console.log(coverPicture , "coverPicture");
 console.log(userProfile , "userProfile llllllllllllll");
@@ -16,7 +18,7 @@ console.log(userProfile , "userProfile llllllllllllll");
           <CardBackground>
           <img src={coverPicture || "/images/card-bg.svg"} alt="Cover Background" />
           </CardBackground>
-          <Link to="/profile">
+          <Link to={`/profile/${article?.user?.uid}`}>
             <Photo>
             <img
                 src={profilePicture || user?.photoURL || "/images/user.webp"}
