@@ -8,53 +8,52 @@ import EditProfileModal from "../components/EditProfileModal";
 import {
   setProfilePicture,
   setCoverPicture,
-  setUserProfile,
+  setCurrentUserProfile,
+  setViewedUserProfile,
+  fetchViewedUserProfile,
 } from "../Redux/Slices/profileSlice";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 function Profile() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
-  const { profilePicture, coverPicture, userProfile } = useSelector(
-    (state) => state.profile
-  );
-  const { article, loading: articleLoading } = useSelector(
-    (state) => state.article
-  );
-  console.log(article, "article");
+  const { currentUserProfile, viewedUserProfile } = useSelector((state) => state.profile);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [coverModalOpen, setCoverModalOpen] = useState(false);
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
-  const location = useLocation();
-  const { id } = useParams(); // Ensure to get the ID from params
+  const { id } = useParams(); // Get the ID from params
+
+  const isCurrentUserProfile = id === user?.uid; // Check if the current profile page is of the logged-in user
 
   useEffect(() => {
-    fetchProfileData();
-  }, [id]); // Add id to the dependency array to re-fetch when it changes
+    if (isCurrentUserProfile) {
+      fetchCurrentUserProfile();
+    } else {
+      dispatch(fetchViewedUserProfile(id));
+    }
+  }, [id, user]); // Add id and user to the dependency array to re-fetch when they change
 
-  const fetchProfileData = async () => {
+  const fetchCurrentUserProfile = async () => {
     try {
       const db = getFirestore();
-      const userId = id || user.uid; // Fallback to logged-in user's UID if ID is not provided
+      const userId = user.uid; // Use logged-in user's UID
       const userDoc = await getDoc(doc(db, "users", userId));
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        dispatch(setProfilePicture(userData.photoURL));
-        dispatch(setCoverPicture(userData.coverPhotoURL));
         dispatch(
-          setUserProfile({
-            firstname: userData.firstname,
-            lastname: userData.lastname,
-            city: userData.city,
-            country: userData.country,
-            headline: userData.headline,
+          setCurrentUserProfile({
+            ...userData,
+            photoURL: userData.photoURL,
+            coverPhotoURL: userData.coverPhotoURL,
           })
         );
+        dispatch(setProfilePicture(userData.photoURL));
+        dispatch(setCoverPicture(userData.coverPhotoURL));
       }
     } catch (error) {
-      console.error("Error fetching profile data: ", error);
+      console.error("Error fetching current user profile data: ", error);
     }
   };
 
@@ -82,44 +81,48 @@ function Profile() {
     setEditProfileModalOpen(false);
   };
 
+  const profileData = isCurrentUserProfile ? currentUserProfile : viewedUserProfile;
+  const profilePic = isCurrentUserProfile ? currentUserProfile?.photoURL : viewedUserProfile?.photoURL;
+  const coverPic = isCurrentUserProfile ? currentUserProfile?.coverPhotoURL : viewedUserProfile?.coverPhotoURL;
+  const profileUrl = `www.linkedin.com/in/${profileData?.firstname?.toLowerCase()}-${profileData?.lastname?.toLowerCase()}-${id}`;
+
   return (
     <Container>
       <ProfileWrapper>
         <LeftSide>
           <CoverPhoto>
-            <Edit onClick={handleOpenCoverModal}>
-              <EditIcon />
-            </Edit>
+            {isCurrentUserProfile && (
+              <Edit onClick={handleOpenCoverModal}>
+                <EditIcon />
+              </Edit>
+            )}
             <CoverPic>
-              <img
-                src={coverPicture || "/images/card-bg.svg"}
-                alt="Cover Background"
-              />
+              <img src={coverPic || "/images/card-bg.svg"} alt="Cover Background" />
             </CoverPic>
-            <ProfilePic onClick={handleOpenProfileModal}>
-              <img
-                src={profilePicture || user?.photoURL || "/images/user.webp"}
-                alt="Profile"
-              />
+            <ProfilePic onClick={isCurrentUserProfile ? handleOpenProfileModal : undefined}>
+              <img src={profilePic || user?.photoURL || "/images/user.webp"} alt="Profile" />
             </ProfilePic>
           </CoverPhoto>
 
           <UserData>
-            <EiditData onClick={handleOpenEditProfileModal}>
-              <EditIcon />
-            </EiditData>
+            {isCurrentUserProfile && (
+              <EiditData onClick={handleOpenEditProfileModal}>
+                <EditIcon />
+              </EiditData>
+            )}
             <Data>
               <h1>
-                {`${userProfile?.firstname || ""} ${
-                  userProfile?.lastname || ""
-                } ${article?.user?.displayName || ""}`}
+                {profileData?.firstname || profileData?.lastname
+                  ? `${profileData?.firstname || ""} ${profileData?.lastname || ""}`
+                  : user?.displayName || ""}
               </h1>
+
               <ul>
-                <li>{userProfile.headline}</li>
+                <li>{profileData.headline}</li>
               </ul>
 
               <p>
-                {userProfile.city}, {userProfile.country}:{" "}
+                {profileData.city}, {profileData.country}:{" "}
                 <span>Contact info</span>
                 <h3>91 connections</h3>
               </p>
@@ -142,22 +145,22 @@ function Profile() {
                 <h2>Profile language</h2>
                 <p>English</p>
               </div>
-              <EditIcon style={{ cursor: "pointer" }} />
+              {isCurrentUserProfile && <EditIcon style={{ cursor: "pointer" }} />}
             </Top>
             <Bottom>
               <div>
                 <h2>Public profile & URL</h2>
-                <p>www.linkedin.com/in/sameer-khan-75520827b</p>
+                <p>{profileUrl}</p>
               </div>
-              <EditIcon style={{ cursor: "pointer" }} />
+              {isCurrentUserProfile && <EditIcon style={{ cursor: "pointer" }} />}
             </Bottom>
           </RightTop>
           <RightBottom>
-            <p>Sameer unlock your full potential with LinkedIn premium</p>
+            <p>{profileData.firstname}, unlock your full potential with LinkedIn premium</p>
             <div>
               <img
                 style={{ borderRadius: "50%", objectFit: "cover" }}
-                src={profilePicture || user?.photoURL || "/images/user.webp"}
+                src={profilePic || user?.photoURL || "/images/user.webp"}
                 alt="Profile"
               />
               <img src="/images/key.jpg" alt="Key" />
@@ -182,6 +185,9 @@ function Profile() {
     </Container>
   );
 }
+
+
+
 
 const Container = styled.div`
   padding-top: 75px;

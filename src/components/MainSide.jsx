@@ -195,7 +195,7 @@ function MainSide() {
       )}
       <ShareBox>
         <div >
-        <Link to={`/profile/${article?.user?.uid}`}>
+        <Link to={`/profile/${user?.uid}`}>
       <img src={profilePicture || user?.photoURL || "/images/user.webp"} alt="" />
           </Link>
           <button onClick={handleOpenModal}>Start a Post</button>

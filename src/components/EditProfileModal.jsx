@@ -5,7 +5,7 @@ import { updateProfileData } from "../Redux/Slices/profileSlice";
 
 const EditProfileModal = ({ open, handleClose }) => {
   const dispatch = useDispatch();
-  const userProfile = useSelector((state) => state.profile.userProfile);
+  const userProfile = useSelector((state) => state.profile.currentUserProfile); // Use currentUserProfile
   const { user } = useSelector((state) => state.user);
   const [editedProfile, setEditedProfile] = useState({
     city: userProfile.city || "",
@@ -14,6 +14,7 @@ const EditProfileModal = ({ open, handleClose }) => {
     firstname: userProfile.firstname || "",
     lastname: userProfile.lastname || "",
   });
+
   useEffect(() => {
     setEditedProfile({
       city: userProfile.city || user?.city || "",
@@ -36,9 +37,6 @@ const EditProfileModal = ({ open, handleClose }) => {
     dispatch(updateProfileData(editedProfile));
     handleClose();
   };
-
-  console.log(editedProfile, "editedProfile");
-  console.log(userProfile, "userProfile");
 
   return (
     <Dialog open={open} onClose={handleClose}>

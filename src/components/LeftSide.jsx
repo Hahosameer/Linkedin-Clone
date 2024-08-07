@@ -3,38 +3,36 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 
-
-function LeftSide(props) {
+function LeftSide() {
   const { user } = useSelector((state) => state.user);
-  const { profilePicture, coverPicture, userProfile } = useSelector((state) => state.profile);
-  const { article, loading: articleLoading } = useSelector((state) => state.article);
-  console.log(user, "left user");
-console.log(coverPicture , "coverPicture");
-console.log(userProfile , "userProfile llllllllllllll");
+  const { profilePicture, coverPicture, currentUserProfile } = useSelector(
+    (state) => state.profile
+  );
+
   return (
     <Container>
       <ArtCard>
         <UserInfo>
           <CardBackground>
-          <img src={coverPicture || "/images/card-bg.svg"} alt="Cover Background" />
+            <img src={coverPicture || "/images/card-bg.svg"} alt="Cover Background" />
           </CardBackground>
-          <Link to={`/profile/${article?.user?.uid}`}>
+          <Link to={`/profile/${user?.uid}`}>
             <Photo>
-            <img
+              <img
                 src={profilePicture || user?.photoURL || "/images/user.webp"}
                 alt="Profile"
               />
             </Photo>
           </Link>
           <Links>
-            { userProfile?.firstname ||  user?.displayName || "Sameer Khan"} {userProfile?.lastname}
-          </Links>
+  {currentUserProfile?.firstname && currentUserProfile?.lastname
+    ? `${currentUserProfile.firstname} ${currentUserProfile.lastname}`
+    : user?.displayName || ""}
+</Links>
           <a>
             <AddPhotoText>
               <ul>
-                <li>
-                {userProfile.headline}
-                </li>
+                <li>{currentUserProfile?.headline}</li>
               </ul>
             </AddPhotoText>
           </a>
@@ -75,6 +73,7 @@ console.log(userProfile , "userProfile llllllllllllll");
     </Container>
   );
 }
+
 
 const Container = styled.div`
   grid-area: leftside;

@@ -6,13 +6,20 @@ const initialState = {
   profilePicture: null,
   coverPicture: null,
   progress: 0,
-  userProfile: {
+  currentUserProfile: {
     firstname: "",
     lastname: "",
     city: "",
     country: "",
     headline: "",
   },
+  viewedUserProfile: {
+    firstname: "",
+    lastname: "",
+    city: "",
+    country: "",
+    headline: "",
+  }
 };
 
 const profileSlice = createSlice({
@@ -28,13 +35,17 @@ const profileSlice = createSlice({
     setProgress: (state, action) => {
       state.progress = action.payload;
     },
-    setUserProfile: (state, action) => {
-      state.userProfile = { ...state.userProfile, ...action.payload }; // merging current and new data
+    setCurrentUserProfile: (state, action) => {
+      state.currentUserProfile = { ...state.currentUserProfile, ...action.payload }; // merging current and new data
+    },
+    setViewedUserProfile: (state, action) => {
+      state.viewedUserProfile = { ...state.viewedUserProfile, ...action.payload }; // merging current and new data
     },
   },
 });
 
-export const { setProfilePicture, setCoverPicture, setProgress, setUserProfile } = profileSlice.actions;
+// Export actions
+export const { setProfilePicture, setCoverPicture, setProgress, setCurrentUserProfile, setViewedUserProfile } = profileSlice.actions;
 
 export const updateProfilePicture = (profilePictureURL) => async (dispatch) => {
   try {
@@ -101,10 +112,25 @@ export const updateProfileData = (userProfile) => async (dispatch) => {
 
       await updateDoc(userDocRef, userProfile);
 
-      dispatch(setUserProfile(userProfile));
+      dispatch(setCurrentUserProfile(userProfile));
     }
   } catch (error) {
     console.error("Error updating profile data: ", error);
+  }
+};
+
+export const fetchViewedUserProfile = (userId) => async (dispatch) => {
+  try {
+    const db = getFirestore();
+    const userDocRef = doc(db, 'users', userId);
+
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      dispatch(setViewedUserProfile(userData));
+    }
+  } catch (error) {
+    console.error("Error fetching viewed user profile: ", error);
   }
 };
 

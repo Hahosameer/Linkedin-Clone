@@ -8,9 +8,10 @@ import { Link } from "react-router-dom";
 function Header(props) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
-  const { profilePicture, userProfile } = useSelector((state) => state.profile);
+  const { profilePicture, currentUserProfile } = useSelector(
+    (state) => state.profile
+  );
   const [showSignOut, setShowSignOut] = useState(false);
-  const { article, loading: articleLoading } = useSelector((state) => state.article);
   const signOutRef = useRef(null);
 
   const handleSignOutClick = () => {
@@ -90,48 +91,65 @@ function Header(props) {
             </NavList>
             <NavList>
               <a title="Notifications">
-                <img src="/images/nav-notifications.svg" alt="Notifications Icon" />
+                <img
+                  src="/images/nav-notifications.svg"
+                  alt="Notifications Icon"
+                />
                 <span>Notifications</span>
               </a>
             </NavList>
             <User ref={signOutRef}>
               <a onClick={handleSignOutClick}>
-                <img src={ user?.photoURL || profilePicture || "/images/user.webp"} alt="Profile" />
+                <img
+                  src={ profilePicture ||user?.photoURL  || "/images/user.webp"}
+                  alt="Profile"
+                />
                 <span>
                   Me
                   <img src="/images/down-icon.svg" alt="Down Arrow" />
                 </span>
-            
-              {showSignOut && (
-                <SignOut>
-                  <SignOutTop>
-                    <div>
-                      <img src={ user?.photoURL ||profilePicture || "/images/user.webp"} alt="Profile" />
-                    </div>
-                    <div>
-                      <h1>  {`${userProfile?.firstname || ""} ${
-                  userProfile?.lastname || ""
-                } ${article?.user?.displayName || ""}`}</h1>
-                      <ul>
-                        <li>{userProfile?.headline}</li>
-                      </ul>
-                    </div>
-                  </SignOutTop>
-                  <Link to={`/profile/${article?.user?.uid}`}>
-                    <button>View Profile</button>
-                  </Link>
-                  <Link to="/login">
-                    <a onClick={handleSignOut}>Sign Out</a>
-                  </Link>
-                </SignOut>
-              )}
-                </a>
+
+                {showSignOut && (
+                  <SignOut>
+                    <SignOutTop>
+                      <div>
+                        <img
+                          src={
+                            profilePicture ||
+                            user?.photoURL ||
+                            "/images/user.webp"
+                          }
+                          alt="Profile"
+                        />
+                      </div>
+                      <div>
+                        <h1>
+                          {currentUserProfile?.firstname &&
+                          currentUserProfile?.lastname
+                            ? `${currentUserProfile.firstname} ${currentUserProfile.lastname}`
+                            : user?.displayName || ""}
+                        </h1>
+                        <ul>
+                          <li>{currentUserProfile.headline}</li>
+                        </ul>
+                      </div>
+                    </SignOutTop>
+                    <Link to={`/profile/${user?.uid}`}>
+                      <button>View Profile</button>
+                    </Link>
+                    <Link to="/login">
+                      <a onClick={handleSignOut}>Sign Out</a>
+                    </Link>
+                  </SignOut>
+                )}
+              </a>
             </User>
             <Work>
               <a>
                 <img src="/images/nav-work.svg" alt="Work Icon" />
                 <span>
-                  Work <img src="/images/down-icon.svg" alt="Down Arrow" />
+                  Work
+                  <img src="/images/down-icon.svg" alt="Down Arrow" />
                 </span>
               </a>
             </Work>
@@ -141,7 +159,6 @@ function Header(props) {
     </Container>
   );
 }
-
 
 const Container = styled.div`
   background-color: white;
@@ -312,20 +329,18 @@ const SignOut = styled.div`
   border-radius: 0 0 5px 5px;
   font-size: 16px;
   transition-duration: 167ms;
-  border-radius: 10px 0px 10px 0px ;
+  border-radius: 10px 0px 10px 0px;
   border: 1px solid black;
-  button{
-  background: white;
-  width: 95%;
-  border-radius: 10px;
-  border: 2px solid #38acff;
-margin:5px ;
-padding: 4px;
-color: #38acff;
-cursor: pointer !important;
-
-
-}
+  button {
+    background: white;
+    width: 95%;
+    border-radius: 10px;
+    border: 2px solid #38acff;
+    margin: 5px;
+    padding: 4px;
+    color: #38acff;
+    cursor: pointer !important;
+  }
   a {
     cursor: pointer !important;
     border-top: 1px solid #b4b3b3;
@@ -334,39 +349,37 @@ cursor: pointer !important;
     padding-left: 10px;
     text-decoration: none;
     color: black;
-   
-    &:hover{
-      background-color:#EBEBEB
+
+    &:hover {
+      background-color: #ebebeb;
     }
   }
 `;
 const SignOutTop = styled.div`
-display: flex;
-width:250px;
-padding: 10px;
+  display: flex;
+  width: 250px;
+  padding: 10px;
 
-
-img{
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-h1{
-  margin-top: 10px;
-  margin-left: 15px;
-  font-size: 18px;
-  text-transform: capitalize;
-}
-ul{
-  margin-left: 15px;
-  li{
-    list-style: none;
-    font-size: 14px;
+  img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
   }
-}
-
-`
+  h1 {
+    margin-top: 10px;
+    margin-left: 15px;
+    font-size: 18px;
+    text-transform: capitalize;
+  }
+  ul {
+    margin-left: 15px;
+    li {
+      list-style: none;
+      font-size: 14px;
+    }
+  }
+`;
 
 const User = styled(NavList)`
   a > svg {
