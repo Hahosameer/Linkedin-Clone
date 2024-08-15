@@ -9,7 +9,6 @@ import {
   setProfilePicture,
   setCoverPicture,
   setCurrentUserProfile,
-  setViewedUserProfile,
   fetchViewedUserProfile,
 } from "../Redux/Slices/profileSlice";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
@@ -22,9 +21,9 @@ function Profile() {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [coverModalOpen, setCoverModalOpen] = useState(false);
   const [editProfileModalOpen, setEditProfileModalOpen] = useState(false);
-  const { id } = useParams(); // Get the ID from params
+  const { id } = useParams();
 
-  const isCurrentUserProfile = id === user?.uid; // Check if the current profile page is of the logged-in user
+  const isCurrentUserProfile = id === user?.uid;
 
   useEffect(() => {
     if (isCurrentUserProfile) {
@@ -32,58 +31,39 @@ function Profile() {
     } else {
       dispatch(fetchViewedUserProfile(id));
     }
-  }, [id, user]); // Add id and user to the dependency array to re-fetch when they change
+  }, [id, user?.uid, dispatch]);
 
   const fetchCurrentUserProfile = async () => {
     try {
       const db = getFirestore();
-      const userId = user.uid; // Use logged-in user's UID
+      const userId = user.uid;
       const userDoc = await getDoc(doc(db, "users", userId));
 
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        dispatch(
-          setCurrentUserProfile({
-            ...userData,
-            photoURL: userData.photoURL,
-            coverPhotoURL: userData.coverPhotoURL,
-          })
-        );
-        dispatch(setProfilePicture(userData.photoURL));
-        dispatch(setCoverPicture(userData.coverPhotoURL));
+        dispatch(setCurrentUserProfile({
+          ...userData,
+          photoURL: userData.photoURL,
+          coverPhotoURL: userData.coverPhotoURL,
+        }));
+        dispatch(setProfilePicture(userData.photoURL || ""));
+        dispatch(setCoverPicture(userData.coverPhotoURL || ""));
       }
     } catch (error) {
       console.error("Error fetching current user profile data: ", error);
     }
   };
 
-  const handleOpenProfileModal = () => {
-    setProfileModalOpen(true);
-  };
-
-  const handleCloseProfileModal = () => {
-    setProfileModalOpen(false);
-  };
-
-  const handleOpenCoverModal = () => {
-    setCoverModalOpen(true);
-  };
-
-  const handleCloseCoverModal = () => {
-    setCoverModalOpen(false);
-  };
-
-  const handleOpenEditProfileModal = () => {
-    setEditProfileModalOpen(true);
-  };
-
-  const handleCloseEditProfileModal = () => {
-    setEditProfileModalOpen(false);
-  };
+  const handleOpenProfileModal = () => setProfileModalOpen(true);
+  const handleCloseProfileModal = () => setProfileModalOpen(false);
+  const handleOpenCoverModal = () => setCoverModalOpen(true);
+  const handleCloseCoverModal = () => setCoverModalOpen(false);
+  const handleOpenEditProfileModal = () => setEditProfileModalOpen(true);
+  const handleCloseEditProfileModal = () => setEditProfileModalOpen(false);
 
   const profileData = isCurrentUserProfile ? currentUserProfile : viewedUserProfile;
-  const profilePic = isCurrentUserProfile ? currentUserProfile?.photoURL : viewedUserProfile?.photoURL;
-  const coverPic = isCurrentUserProfile ? currentUserProfile?.coverPhotoURL : viewedUserProfile?.coverPhotoURL;
+  const profilePic = profileData?.photoURL || "/images/user.webp";
+  const coverPic = profileData?.coverPhotoURL || "/images/card-bg.svg";
   const profileUrl = `www.linkedin.com/in/${profileData?.firstname?.toLowerCase()}-${profileData?.lastname?.toLowerCase()}-${id}`;
 
   return (
@@ -97,10 +77,10 @@ function Profile() {
               </Edit>
             )}
             <CoverPic>
-              <img src={coverPic || "/images/card-bg.svg"} alt="Cover Background" />
+              <img src={coverPic} alt="Cover Background" />
             </CoverPic>
             <ProfilePic onClick={isCurrentUserProfile ? handleOpenProfileModal : undefined}>
-              <img src={profilePic || user?.photoURL || "/images/user.webp"} alt="Profile" />
+              <img src={profilePic} alt="Profile" />
             </ProfilePic>
           </CoverPhoto>
 
@@ -160,7 +140,7 @@ function Profile() {
             <div>
               <img
                 style={{ borderRadius: "50%", objectFit: "cover" }}
-                src={profilePic || user?.photoURL || "/images/user.webp"}
+                src={profilePic}
                 alt="Profile"
               />
               <img src="/images/key.jpg" alt="Key" />
@@ -185,6 +165,8 @@ function Profile() {
     </Container>
   );
 }
+
+
 
 
 

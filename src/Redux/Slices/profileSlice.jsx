@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
-
+import { useParams } from 'react-router-dom';
 const initialState = {
   profilePicture: null,
   coverPicture: null,
@@ -12,6 +12,8 @@ const initialState = {
     city: "",
     country: "",
     headline: "",
+    photoURL: "", // Ensure default is an empty string
+    coverPhotoURL: "",
   },
   viewedUserProfile: {
     firstname: "",
@@ -19,6 +21,8 @@ const initialState = {
     city: "",
     country: "",
     headline: "",
+    photoURL: "", // Ensure default is an empty string
+    coverPhotoURL: "",
   }
 };
 
@@ -36,15 +40,14 @@ const profileSlice = createSlice({
       state.progress = action.payload;
     },
     setCurrentUserProfile: (state, action) => {
-      state.currentUserProfile = { ...state.currentUserProfile, ...action.payload }; // merging current and new data
+      state.currentUserProfile = { ...state.currentUserProfile, ...action.payload };
     },
     setViewedUserProfile: (state, action) => {
-      state.viewedUserProfile = { ...state.viewedUserProfile, ...action.payload }; // merging current and new data
+      state.viewedUserProfile = { ...state.viewedUserProfile, ...action.payload };
     },
   },
 });
 
-// Export actions
 export const { setProfilePicture, setCoverPicture, setProgress, setCurrentUserProfile, setViewedUserProfile } = profileSlice.actions;
 
 export const updateProfilePicture = (profilePictureURL) => async (dispatch) => {
@@ -57,17 +60,13 @@ export const updateProfilePicture = (profilePictureURL) => async (dispatch) => {
       const userDocRef = doc(db, 'users', user.uid);
 
       const userDoc = await getDoc(userDocRef);
-      if (!userDoc.exists()) {
-        await setDoc(userDocRef, {
-          photoURL: profilePictureURL,
-        });
+      if (userDoc.exists()) {
+        await updateDoc(userDocRef, { photoURL: profilePictureURL });
+        dispatch(setProfilePicture(profilePictureURL));
       } else {
-        await updateDoc(userDocRef, {
-          photoURL: profilePictureURL,
-        });
+        await setDoc(userDocRef, { photoURL: profilePictureURL });
+        dispatch(setProfilePicture(profilePictureURL));
       }
-
-      dispatch(setProfilePicture(profilePictureURL));
     }
   } catch (error) {
     console.error("Error updating profile picture: ", error);
@@ -120,14 +119,29 @@ export const updateProfileData = (userProfile) => async (dispatch) => {
 };
 
 export const fetchViewedUserProfile = (userId) => async (dispatch) => {
+  console.log(userId, "idddddddddd");
+
   try {
     const db = getFirestore();
     const userDocRef = doc(db, 'users', userId);
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
 
     const userDoc = await getDoc(userDocRef);
     if (userDoc.exists()) {
       const userData = userDoc.data();
-      dispatch(setViewedUserProfile(userData));
+
+      dispatch(setViewedUserProfile({
+        firstname: userData.firstname || ".", // First name from Firestore or Google, or empty string
+        lastname: userData.lastname || "",  // Last name from Firestore or Google, or empty string
+        city: userData.city || "", // Default to empty string if not provided
+        country: userData.country || "", // Default to empty string if not provided
+        headline: userData.headline || "", // Default to empty string if not provided
+        photoURL: userData.photoURL || currentUser.photoURL || "/images/user.webp", // User's uploaded photo, or Google photo, or default
+        coverPhotoURL: userData.coverPhotoURL || "/images/card-bg.svg", // User's uploaded cover, or default
+      }));
+    } else {
+      console.error("No such document exists!");
     }
   } catch (error) {
     console.error("Error fetching viewed user profile: ", error);
